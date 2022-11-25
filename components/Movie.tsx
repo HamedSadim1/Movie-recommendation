@@ -4,88 +4,175 @@ import {
   View,
   FlatList,
   Image,
+  Dimensions,
+  ScrollView,
   ActivityIndicator,
-  Pressable,
 } from "react-native";
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useRef } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Data, Result } from "./services/IMovieData";
 import axios from "axios";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  getUpcomingMovies,
+  getPopularMovies,
+  getPopularTv,
+  getFamilyMovies,
+  getDocumentary,
+} from "./services/IMovieData";
+import List from "./List";
 
 const Movie = () => {
-  const [moviePopular, setMoviePopular] = useState<Data>({
+  // crate a popular movies
+  const [popularMovies, setPopularMovies] = useState<Data>({
     page: 0,
     results: [],
     total_pages: 0,
     total_results: 0,
   } as Data);
-  const navigation: any = useNavigation();
-  const { results } = moviePopular;
-  const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
 
-  const getMoviePopular = async () => {
-    setLoading(true);
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/movie/popular?api_key=18f0c1bfe643593733b0a4c124cbae28&language=en-US&page=${page}`
-    );
-    setMoviePopular(response.data);
-    setLoading(false);
-  };
+  // upcoming movies
+  const [upcomingMovies, setUpcomingMovies] = useState<Data>({
+    page: 0,
+    results: [],
+    total_pages: 0,
+    total_results: 0,
+  } as Data);
+
+  // popular tv
+  const [popularTv, setPopularTv] = useState<Data>({
+    page: 0,
+    results: [],
+    total_pages: 0,
+    total_results: 0,
+  } as Data);
+
+  // family movies
+  const [familyMovies, setFamilyMovies] = useState<Data>({
+    page: 0,
+    results: [],
+    total_pages: 0,
+    total_results: 0,
+  } as Data);
+
+  // get Documentary
+  const [documentary, setDocumentary] = useState<Data>({
+    page: 0,
+    results: [],
+    total_pages: 0,
+    total_results: 0,
+  } as Data);
+
+  // Error
+
+  //
+  const navigation: any = useNavigation();
+
+  // loading
+  const [loading, setLoading] = useState<boolean>(false);
+
   // PostUrl Function Give the source of the Url Image
   const PosterUrl = (source: string) => {
-    return `https://image.tmdb.org/t/p/original${source}`;
+    return `https://image.tmdb.org/t/p/w500${source}`;
+  };
+
+  // get Dimension width and height
+  const width = Dimensions.get("window").width;
+
+  let flatList = useRef<FlatList<string[]>>();
+
+  const infiniteScroll = () => {
+    const numberOfData: number = 20;
+    let scrollValue: number = 0;
+    let scrolled: number = 0;
+
+    setInterval(() => {
+      scrolled++;
+      if (scrolled < numberOfData) scrollValue = scrollValue + width;
+      else {
+        scrollValue = 0;
+        scrolled = 0;
+      }
+
+      if (flatList?.current) {
+        flatList.current.scrollToOffset({
+          animated: true,
+          offset: scrollValue,
+        });
+      }
+    }, 3000);
+  };
+
+  // Promise Array
+  const getData = () => {
+    return Promise.all([
+      getPopularMovies(),
+      getUpcomingMovies(),
+      getPopularTv(),
+      getFamilyMovies(),
+      getDocumentary(),
+    ]);
   };
 
   useEffect(() => {
-    getMoviePopular();
-  }, [page]);
+    setLoading(true);
+    getData()
+      .then((data) => {
+        setPopularMovies(data[0]);
+        setUpcomingMovies(data[1]);
+        setPopularTv(data[2]);
+        setFamilyMovies(data[3]);
+        setDocumentary(data[4]);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-  const handleClickPage = () => {
-    setPage(page + 1);
-  };
+    infiniteScroll();
+  }, []);
 
   return (
-    <View>
-      <Text style={styles.title}>Popular Movies</Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={results}
-          renderItem={({ item }) => (
-            <View>
-              <Pressable
-                onPress={() => {
-                  navigation.push("Movie", { movie: item.id });
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  {item.title}
-                </Text>
-                <Image
-                  source={{ uri: PosterUrl(item.backdrop_path) }}
-                  style={styles.image}
-                />
-              </Pressable>
+    <ScrollView>
+      <View style={styles.container}>
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={styles.loading}
+          />
+        ) : (
+          <>
+            <View style={styles.list}>
+              <FlatList
+                ref={flatList as any}
+                horizontal
+                pagingEnabled={true}
+                showsHorizontalScrollIndicator={false}
+                legacyImplementation={false}
+                data={upcomingMovies.results}
+                renderItem={({ item }) => (
+                  <Image
+                    resizeMode="cover"
+                    style={{ width, height: 600 }}
+                    source={{ uri: PosterUrl(item.poster_path) }}
+                  />
+                )}
+                keyExtractor={(item) => item.id.toString()}
+              />
             </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          onEndReached={() => {
-            handleClickPage();
-          }}
-        />
-      )}
-    </View>
+            <List title="Popular Movies" Movies={popularMovies} />
+            <List title="Upcoming Movies" Movies={upcomingMovies} />
+            <List title="Popular Tv" Movies={popularTv} />
+            <List title="Family Movies" Movies={familyMovies} />
+            <List title="Documentary" Movies={documentary} />
+          </>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -94,11 +181,7 @@ export default Movie;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    textAlign: "center",
     justifyContent: "center",
-    marginBottom: 20,
   },
   title: {
     fontSize: 20,
@@ -109,18 +192,19 @@ const styles = StyleSheet.create({
     marginEnd: 20,
     paddingTop: 15,
   },
-  image: {
-    width: "100%",
-    height: 300,
-    resizeMode: "center",
+  list: {
+    flex: 3,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  button: {
-    backgroundColor: "blue",
+  loading: {
+    paddingTop: 400,
     flex: 1,
-    color: "white",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    marginBottom: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
