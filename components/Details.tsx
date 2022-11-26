@@ -15,11 +15,9 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { getMovieDetails, Detail } from "./services/IMovieData";
 import { useEffect, useState } from "react";
 import dateFormat from "dateformat";
-import YoutubePlayer from "react-native-youtube-iframe";
 
 import { Rating } from "react-native-ratings";
 import PlayButton from "./PlayButton";
-import VideoPlay from "./VideoPlay";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -98,16 +96,20 @@ const Details = () => {
               </Text>
             </View>
           )}
-          {modalVisible ? (
+          {modalVisible && (
             <Modal
               animationType="slide"
               transparent={true}
               visible={modalVisible}
             >
               <View style={styles.videoModal}></View>
-              <View></View>
+              <View>
+                <Pressable onPress={() => setModalVisible(!modalVisible)}>
+                  <Text>Hide Video</Text>
+                </Pressable>
+              </View>
             </Modal>
-          ) : null}
+          )}
         </ScrollView>
       </View>
     </>

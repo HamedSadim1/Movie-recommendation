@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
 import React, { useState, FC } from "react";
-import VideoPlay from "./VideoPlay";
 
 const Home = () => {
-  return <View style={styles.container}></View>;
+  return (
+    <View style={styles.container}>
+      <Text>Home</Text>
+    </View>
+  );
 };
 
 export default Home;

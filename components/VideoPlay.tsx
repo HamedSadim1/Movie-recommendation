@@ -1,33 +1,18 @@
-import { StyleSheet, Text, View, Alert } from "react-native";
-import React, { useState, useCallback } from "react";
-import YoutubePlayer from "react-native-youtube-iframe";
+import { StyleSheet, Text, View, Alert, Button, Platform } from "react-native";
+import React, { useRef } from "react";
 
 const VideoPlay = () => {
-  const [playing, setPlaying] = useState(false);
-
-  const onStateChange = useCallback((state: string) => {
-    if (state === "ended") {
-      setPlaying(false);
-      Alert.alert("video has finished playing!");
-    }
-  }, []);
-
-  const togglePlaying = useCallback(() => {
-    setPlaying((prev) => !prev);
-  }, []);
-
-  return (
-    <View>
-      <YoutubePlayer
-        height={300}
-        play={playing}
-        videoId={"M7lc1UVf-VE"}
-        onChangeState={onStateChange}
-      />
-    </View>
-  );
+  return <View></View>;
 };
 
 export default VideoPlay;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  backgroundVideo: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+});

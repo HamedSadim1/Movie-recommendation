@@ -157,7 +157,7 @@ const Movie = () => {
                 renderItem={({ item }) => (
                   <Image
                     resizeMode="cover"
-                    style={{ width, height: 600 }}
+                    style={{ width, height: 700 }}
                     source={{ uri: PosterUrl(item.poster_path) }}
                   />
                 )}

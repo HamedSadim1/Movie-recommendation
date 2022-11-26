@@ -3,7 +3,7 @@ import axios from "axios";
 //! Movies
 export interface Data {
   page: number;
-  results?: Result[];
+  results: Result[];
   total_pages: number;
   total_results: number;
 }
@@ -117,6 +117,12 @@ export interface Detail {
   voteCount: number;
 }
 
+export enum OriginalLanguage {
+  En = "en",
+  It = "it",
+  Zh = "zh",
+}
+
 export interface Genre {
   id: number;
   name: string;
@@ -204,6 +210,14 @@ export const getDocumentary = async () => {
 export const getMovieTrailers = async (id: number) => {
   const response = await axios.get(
     `${apiUrl}/movie/${id}/videos?api_key=${apiKey}&language=en-US`
+  );
+  return response.data;
+};
+
+// ! SearchMovie
+export const searchMovie = async (query: string) => {
+  const response = await axios.get<Data>(
+    `${apiUrl}/search/movie?api_key=${apiKey}&language=en-US&query=${query}&page=1&include_adult=false`
   );
   return response.data;
 };
