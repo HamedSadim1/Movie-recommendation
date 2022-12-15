@@ -6,6 +6,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import Home from "./components/Home";
 import MovieDetails from "./components/MovieDetails";
+import FavoriteMovies from "./components/FavoriteMovies";
 const Tab = createBottomTabNavigator();
 
 const Stack = createNativeStackNavigator();
@@ -36,6 +37,16 @@ export default function App() {
           component={MovieDetails}
           options={{
             tabBarLabel: "MovieDetails",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="movie" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="FavoriteMovies"
+          component={FavoriteMovies}
+          options={{
+            tabBarLabel: "FavoriteMovies",
             tabBarIcon: ({ color, size }) => (
               <MaterialIcons name="movie" size={size} color={color} />
             ),

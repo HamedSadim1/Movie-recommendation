@@ -6,7 +6,6 @@ import {
   ScrollView,
   Image,
   Dimensions,
-  Modal,
   Alert,
   Pressable,
 } from "react-native";
@@ -15,9 +14,10 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { getMovieDetails, Detail } from "./services/IMovieData";
 import { useEffect, useState } from "react";
 import dateFormat from "dateformat";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Rating } from "react-native-ratings";
-import PlayButton from "./PlayButton";
+import FavoriteButton from "./FavoriteButton";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -28,10 +28,39 @@ const Details = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [favorite, setFavorite] = useState<string[]>([]);
 
-  const videoShown = () => {
-    setModalVisible(!modalVisible);
+  // const setDataToFavorite = async () => {
+  //   try {
+  //     const arr: string[] = [movieDetails.title];
+  //     const jsonValue = JSON.stringify(arr);
+  //     await AsyncStorage.setItem("favorite", jsonValue);
+  //     console.log("jsonValue", jsonValue);
+  //   } catch (e) {
+  //     console.log("error", e);
+  //   }
+  // };
+
+  const setDataInLocalStorage = async (arr: string[]) => {
+    try {
+      const arrExist = await AsyncStorage.getItem("favorite");
+
+      const includesSameTitle = arrExist?.includes(movieDetails.title);
+      if (includesSameTitle) {
+        Alert.alert("This movie is already in your favorite list");
+        return;
+      }
+      if (arrExist) {
+        const jsonValue = JSON.stringify([...arr, ...JSON.parse(arrExist)]);
+        await AsyncStorage.setItem("favorite", jsonValue);
+      } else {
+        const jsonValue = JSON.stringify(arr);
+        await AsyncStorage.setItem("favorite", jsonValue);
+      }
+      // const jsonValue = JSON.stringify(arr);
+    } catch (e) {
+      console.log("error", e);
+    }
   };
 
   const releaseDateFormat = dateFormat(
@@ -71,10 +100,15 @@ const Details = () => {
                 style={styles.image}
               />
               <View style={styles.PlayButton}>
-                <PlayButton handlePress={videoShown} />
+                <FavoriteButton
+                  handlePress={() => {
+                    const arr: string[] = [...favorite, movieDetails.title];
+                    setFavorite(arr);
+                    setDataInLocalStorage(arr);
+                  }}
+                />
               </View>
               <Text style={styles.movieTitle}>{movieDetails.title}</Text>
-
               <View style={styles.genreContainer}>
                 {movieDetails.genres?.map((genre) => (
                   <Text key={genre.id} style={styles.genresTitle}>
@@ -82,7 +116,6 @@ const Details = () => {
                   </Text>
                 ))}
               </View>
-
               <Rating
                 type="star"
                 ratingCount={5}
@@ -96,21 +129,8 @@ const Details = () => {
               </Text>
             </View>
           )}
-          {modalVisible && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-            >
-              <View style={styles.videoModal}></View>
-              <View>
-                <Pressable onPress={() => setModalVisible(!modalVisible)}>
-                  <Text>Hide Video</Text>
-                </Pressable>
-              </View>
-            </Modal>
-          )}
         </ScrollView>
+        {error.length > 1 ? <Text>{error}</Text> : null}
       </View>
     </>
   );
