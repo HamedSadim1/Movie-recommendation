@@ -6,6 +6,7 @@ import Movie from "./Movie";
 import Navbar from "./Navbar";
 import Search from "./Search";
 import FavoriteMovies from "./FavoriteMovies";
+
 const Stack = createNativeStackNavigator();
 const MovieDetails = () => {
   return (

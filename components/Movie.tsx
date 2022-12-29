@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  Text,
   View,
   FlatList,
   Image,
@@ -8,12 +7,10 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { FC, useState, useEffect, useRef } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Data, Result } from "./services/IMovieData";
-import axios from "axios";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
+
+import { Data } from "./services/IMovieData";
+import { useNavigation } from "@react-navigation/native";
 import {
   getUpcomingMovies,
   getPopularMovies,
@@ -133,6 +130,10 @@ const Movie = () => {
       });
 
     infiniteScroll();
+
+    return () => {
+      infiniteScroll();
+    };
   }, []);
 
   return (

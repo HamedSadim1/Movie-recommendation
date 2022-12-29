@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "377334982727",
+    "project_id": "movierecommendationapp-f415a",
+    "storage_bucket": "movierecommendationapp-f415a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377334982727:android:2df1b0f46c00019af42962",
+        "android_client_info": {
+          "package_name": "com.hamedsadim.movieRecommendation_aap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377334982727-cq8ak14dnqlougtf9i9m0di6jo1u5va5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWqLTIXpfS9KU7wcVJcb5j8l8uBYrjtBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377334982727-cq8ak14dnqlougtf9i9m0di6jo1u5va5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

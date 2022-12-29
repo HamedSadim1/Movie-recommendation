@@ -221,3 +221,11 @@ export const searchMovie = async (query: string) => {
   );
   return response.data;
 };
+
+// ! Find a movie with Id
+export const findMovie = async (id: number) => {
+  const response = await axios.get<Data>(
+    `${apiUrl}/movie/${id}?api_key=${apiKey}&language=en-US`
+  );
+  return response.data;
+};

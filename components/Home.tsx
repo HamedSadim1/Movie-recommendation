@@ -14,8 +14,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: 300,
-    height: 300,
+    justifyContent: "center",
   },
   text: {
     fontSize: 20,

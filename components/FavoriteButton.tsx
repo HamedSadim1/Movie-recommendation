@@ -1,17 +1,27 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface PlayButtonProps {
+interface FavoriteButtonProps {
   handlePress: () => void;
+  onShare: () => Promise<void>;
 }
 
-const FavoriteButton = ({ handlePress }: PlayButtonProps) => {
+const FavoriteButton = ({ handlePress, onShare }: FavoriteButtonProps) => {
   return (
     <View>
-      <Pressable style={styles.button} onPress={() => handlePress()}>
-        <Icon name="favorite" size={30} color="red" />
-      </Pressable>
+      <View>
+        <Pressable style={styles.button} onPress={() => handlePress()}>
+          <Icon name="favorite" size={30} color="red" />
+        </Pressable>
+      </View>
+
+      <View style={styles.shareButton}>
+        <Pressable onPress={() => onShare()}>
+          <Icon name="share" size={30} color="green" />
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -23,5 +33,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     width: 50,
     padding: 10,
+  },
+  shareButton: {
+    alignContent: "center",
+    borderRadius: 50,
+    width: 50,
+    padding: 10,
+    marginLeft: 10,
+    marginTop: 55,
+    marginStart: 10,
   },
 });
