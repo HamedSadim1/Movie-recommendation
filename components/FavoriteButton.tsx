@@ -1,19 +1,32 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface FavoriteButtonProps {
   handlePress: () => void;
   onShare: () => Promise<void>;
+  getFavoriteStatus: () => Promise<string>;
 }
 
-const FavoriteButton = ({ handlePress, onShare }: FavoriteButtonProps) => {
+const FavoriteButton = ({
+  handlePress,
+  onShare,
+  getFavoriteStatus,
+}: FavoriteButtonProps) => {
+  const [favoriteStatus, setFavoriteStatus] = useState<string>("favorite");
+
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      const status = await getFavoriteStatus();
+      setFavoriteStatus(status);
+    };
+    fetchFavoriteStatus();
+  }, [handlePress]);
   return (
     <View>
       <View>
         <Pressable style={styles.button} onPress={() => handlePress()}>
-          <Icon name="favorite" size={30} color="red" />
+          <Icon name={favoriteStatus} size={30} color="red" />
         </Pressable>
       </View>
 
@@ -40,7 +53,7 @@ const styles = StyleSheet.create({
     width: 50,
     padding: 10,
     marginLeft: 10,
-    marginTop: 55,
+    marginTop: 100,
     marginStart: 10,
   },
 });

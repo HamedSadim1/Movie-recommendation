@@ -9,9 +9,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import React, { useState } from "react";
+
 import { searchMovie, Data } from "./services/IMovieData";
 import ListItem from "./ListItem";
 import Icon from "react-native-vector-icons/Ionicons";

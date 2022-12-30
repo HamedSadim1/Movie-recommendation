@@ -25,68 +25,6 @@ export interface Result {
   vote_count: number;
 }
 
-//! Trending List
-// export interface Trending {
-//   page?: number;
-//   results?: Result[];
-//   totalPages?: number;
-//   totalResults?: number;
-// }
-
-// export interface Result {
-//   adult: boolean;
-//   id: number;
-//   name?: string;
-//   originalName?: string;
-//   mediaType?: ResultMediaType;
-//   popularity: number;
-//   gender?: number;
-//   knownForDepartment?: KnownForDepartment;
-//   profilePath?: null | string;
-//   knownFor?: KnownFor[];
-// }
-
-// export interface KnownFor {
-//   adult?: boolean;
-//   backdropPath?: null | string;
-//   id?: number;
-//   title?: string;
-//   originalLanguage?: OriginalLanguage;
-//   originalTitle?: string;
-//   overview?: string;
-//   posterPath?: string;
-//   mediaType?: KnownForMediaType;
-//   genreIDS?: number[];
-//   popularity?: number;
-//   releaseDate?: Date;
-//   video?: boolean;
-//   voteAverage?: number;
-//   voteCount?: number;
-//   name?: string;
-//   originalName?: string;
-//   firstAirDate?: Date;
-//   originCountry?: string[];
-// }
-
-// export enum KnownForMediaType {
-//   Movie = "movie",
-//   Tv = "tv",
-// }
-
-// export enum OriginalLanguage {
-//   En = "en",
-//   Ja = "ja",
-// }
-
-// export enum KnownForDepartment {
-//   Acting = "Acting",
-//   Directing = "Directing",
-// }
-
-// export enum ResultMediaType {
-//   Person = "person",
-// }
-
 //! Movie Details
 
 export interface Detail {
@@ -160,14 +98,6 @@ export const getUpcomingMovies = async () => {
   return response.data;
 };
 
-//! Get top rated movies
-export const getTopRatedMovies = async () => {
-  const response = await axios.get<Data>(
-    `${apiUrl}/movie/top_rated?api_key=${apiKey}&language=en-US&page=1`
-  );
-  return response.data;
-};
-
 //! Get movie details
 export const getMovieDetails = async (id: number) => {
   const response = await axios.get<Detail>(
@@ -176,13 +106,6 @@ export const getMovieDetails = async (id: number) => {
   return response.data;
 };
 
-//! Get movie credits
-export const getMovieCredits = async (id: number) => {
-  const response = await axios.get(
-    `${apiUrl}/movie/${id}/credits?api_key=${apiKey}`
-  );
-  return response.data;
-};
 //! Genre Family movies
 export const getFamilyMovies = async () => {
   const response = await axios.get<Data>(
@@ -202,14 +125,6 @@ export const getPopularTv = async () => {
 export const getDocumentary = async () => {
   const response = await axios.get<Data>(
     `${apiUrl}/discover/movie?api_key=${apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=99`
-  );
-  return response.data;
-};
-
-//! Watch Trailers
-export const getMovieTrailers = async (id: number) => {
-  const response = await axios.get(
-    `${apiUrl}/movie/${id}/videos?api_key=${apiKey}&language=en-US`
   );
   return response.data;
 };

@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect, useRef } from "react";
 
 import { Data } from "./services/IMovieData";
-import { useNavigation } from "@react-navigation/native";
+
 import {
   getUpcomingMovies,
   getPopularMovies,
@@ -61,11 +61,6 @@ const Movie = () => {
     total_results: 0,
   } as Data);
 
-  // Error
-
-  //
-  const navigation: any = useNavigation();
-
   // loading
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -79,12 +74,13 @@ const Movie = () => {
 
   let flatList = useRef<FlatList<string[]>>();
 
+  //!  function sets an interval that will execute every 3 seconds keeps track of the number of times the list has been scrolled. When the number of scrolls reaches the numberOfData limit, the scroll position is reset back to the beginning and the scrolled counter is reset to 0
   const infiniteScroll = () => {
     const numberOfData: number = 20;
     let scrollValue: number = 0;
     let scrolled: number = 0;
 
-    setInterval(() => {
+    const interval = setInterval(() => {
       scrolled++;
       if (scrolled < numberOfData) scrollValue = scrollValue + width;
       else {
@@ -92,35 +88,43 @@ const Movie = () => {
         scrolled = 0;
       }
 
-      if (flatList?.current) {
+      if (flatList.current) {
         flatList.current.scrollToOffset({
           animated: true,
           offset: scrollValue,
         });
       }
     }, 3000);
+
+    return () => clearInterval(interval);
   };
 
-  // Promise Array
-  const getData = () => {
-    return Promise.all([
-      getPopularMovies(),
-      getUpcomingMovies(),
-      getPopularTv(),
-      getFamilyMovies(),
-      getDocumentary(),
-    ]);
+  //! Promise Array
+  const getData = async () => {
+    const popularMovies = await getPopularMovies();
+    const upcomingMovies = await getUpcomingMovies();
+    const popularTv = await getPopularTv();
+    const familyMovies = await getFamilyMovies();
+    const documentary = await getDocumentary();
+
+    return {
+      popularMovies,
+      upcomingMovies,
+      popularTv,
+      familyMovies,
+      documentary,
+    };
   };
 
   useEffect(() => {
     setLoading(true);
     getData()
       .then((data) => {
-        setPopularMovies(data[0]);
-        setUpcomingMovies(data[1]);
-        setPopularTv(data[2]);
-        setFamilyMovies(data[3]);
-        setDocumentary(data[4]);
+        setPopularMovies(data.popularMovies);
+        setUpcomingMovies(data.upcomingMovies);
+        setPopularTv(data.popularTv);
+        setFamilyMovies(data.familyMovies);
+        setDocumentary(data.documentary);
       })
       .catch((error) => {
         console.log(error);
@@ -129,11 +133,8 @@ const Movie = () => {
         setLoading(false);
       });
 
-    infiniteScroll();
-
-    return () => {
-      infiniteScroll();
-    };
+    const unsubscribe = infiniteScroll();
+    return unsubscribe;
   }, []);
 
   return (

@@ -7,7 +7,6 @@ import {
   Image,
   Dimensions,
   Alert,
-  Pressable,
   Share,
 } from "react-native";
 import React, { useRef } from "react";
@@ -21,7 +20,6 @@ import * as Notifications from "expo-notifications";
 
 import { Rating } from "react-native-ratings";
 import FavoriteButton from "./FavoriteButton";
-import Icon from "react-native-vector-icons/MaterialIcons";
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
@@ -29,7 +27,7 @@ const Details = () => {
   const route: RouteProp<any> = useRoute();
   const [movieDetails, setMovieDetails] = useState<Detail>({} as Detail);
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [expoPushToken, setExpoPushToken] = useState<string>("");
   const [notification, setNotification] =
@@ -78,17 +76,17 @@ const Details = () => {
       shouldSetBadge: true,
     }),
   });
-
-  async function schedulePushNotification() {
+  //! the function will called if the heart button clicked
+  const schedulePushNotification = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "You've added a movie to your favorite list!",
-        body: `${movieDetails.title} ${movieDetails.overview}`,
+        body: `Title ${movieDetails.title} \n Review${movieDetails.overview}`,
         data: { data: "goes here" },
       },
       trigger: { seconds: 2 },
     });
-  }
+  };
 
   //! if the button is clicked you will able to share
   const onShare = async () => {
@@ -125,61 +123,82 @@ const Details = () => {
     ? parseInt(route.params.movieId)
     : 0;
 
-  useEffect(() => {
-    setLoading(true);
-    //! give the movieId to get the all data from the API
-    getMovieDetails(movieId)
-      .then((data) => {
-        setMovieDetails(data);
-      })
-      .catch((error) => {
-        setError(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-    //! register for push notification
-    registerForPushNotificationsAsync().then((token) => {
-      if (token !== undefined) setExpoPushToken(token);
-    });
-    //! used to add a listener that will be called whenever a notification is received by the device
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
+  //! check the poster path exist in the localStorage if exist return favorite else favorite-border
 
-    return () => {
-      //! removes the notification subscription for the notificationListener and the responseListener
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      //! remove a notification subscription that was previously created
-      if (responseListener.current)
-        Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, [route]);
+  const getFavoriteStatus = async (): Promise<string> => {
+    const arrExist = await AsyncStorage.getItem("favorite");
+
+    //! Check if arrExist is not null before parsing
+    const arr = arrExist ? JSON.parse(arrExist) : [];
+
+    if (arr?.includes(movieDetails.poster_path)) {
+      return "favorite";
+    } else {
+      return "favorite-border";
+    }
+  };
+
+  useEffect(() => {
+    if (movieId) {
+      setLoading(true);
+      //! give the movieId to get the all data from the API
+      getMovieDetails(movieId)
+        .then((data) => {
+          setMovieDetails(data);
+        })
+        .catch((error) => {
+          setError(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+      //! register for push notification
+      registerForPushNotificationsAsync().then((token) => {
+        if (token !== undefined) setExpoPushToken(token);
+      });
+      //! used to add a listener that will be called whenever a notification is received by the device
+      notificationListener.current =
+        Notifications.addNotificationReceivedListener((notification) => {
+          setNotification(notification);
+        });
+
+      return () => {
+        //! removes the notification subscription for the notificationListener and the responseListener
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
+        //! remove a notification subscription that was previously created
+        if (responseListener.current)
+          Notifications.removeNotificationSubscription(
+            responseListener.current
+          );
+      };
+    }
+  }, []);
   return (
-    <>
+    <View>
       <View style={styles.container}>
-        <ScrollView>
-          {loading ? (
-            <View style={styles.container}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <View style={styles.container}>
+        {!movieId && !route && loading && !movieDetails && (
+          <ActivityIndicator size="large" color="#0000ff" />
+        )}
+      </View>
+      <ScrollView>
+        <View style={styles.container}>
+          {movieDetails && route !== null && !loading && movieId !== 0 && (
+            <View>
               <Image
                 source={{
                   uri: `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`,
                 }}
                 style={styles.image}
               />
-              <View style={styles.PlayButton}>
+              <View style={styles.favoriteButton}>
                 <FavoriteButton
                   handlePress={() => {
                     setDataInLocalStorage(movieDetails.poster_path);
                   }}
                   onShare={onShare}
+                  getFavoriteStatus={getFavoriteStatus}
                 />
               </View>
               <Text style={styles.movieTitle}>{movieDetails.title}</Text>
@@ -190,26 +209,30 @@ const Details = () => {
                   </Text>
                 ))}
               </View>
-              <View>
-                <Rating
-                  type="star"
-                  ratingCount={5}
-                  imageSize={30}
-                  readonly={true}
-                  startingValue={movieDetails.vote_average / 2}
-                  tintColor=""
-                />
-              </View>
+              <Rating
+                type="star"
+                ratingCount={5}
+                imageSize={30}
+                readonly={true}
+                startingValue={movieDetails.vote_average / 2}
+                tintColor=""
+              />
               <Text style={styles.overview}>{movieDetails.overview}</Text>
               <Text style={styles.releaseDate}>
                 Release Date: {releaseDateFormat}
               </Text>
             </View>
           )}
-        </ScrollView>
-        {error.length > 1 ? <Text>{error}</Text> : null}
-      </View>
-    </>
+        </View>
+      </ScrollView>
+
+      {error.length > 1 && <Text>{error}</Text>}
+      {movieId === 0 && route === null && (
+        <View style={styles.container}>
+          <Text style={styles.movieTitle}>No Movie Found</Text>
+        </View>
+      )}
+    </View>
   );
 };
 
@@ -236,9 +259,11 @@ const styles = StyleSheet.create({
     color: "black",
     marginTop: 10,
     marginBottom: 10,
+    textAlign: "center",
   },
   overview: {
     padding: 15,
+    textAlign: "center",
   },
   genreContainer: {
     flexDirection: "row",
@@ -257,25 +282,13 @@ const styles = StyleSheet.create({
   },
   releaseDate: {
     fontWeight: "bold",
+    textAlign: "center",
   },
-  PlayButton: {
+  favoriteButton: {
     position: "absolute",
     top: 0,
     right: 0,
     marginTop: 290,
     marginRight: 20,
-  },
-  videoModal: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-  },
-  backgroundVideo: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
   },
 });

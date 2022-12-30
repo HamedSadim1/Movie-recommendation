@@ -1,14 +1,8 @@
 import { StyleSheet, Text, View, FlatList, Image } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AsyncStorage, {
   useAsyncStorage,
 } from "@react-native-async-storage/async-storage";
-import {
-  getMovieDetails,
-  Detail,
-  Result,
-} from "../components/services/IMovieData";
-import { Data } from "./services/IMovieData";
 
 const FavoriteMovies = () => {
   const { getItem } = useAsyncStorage("favorite");

@@ -20,7 +20,8 @@ const Navbar = ({ main }: NavbarProps) => {
     <SafeAreaView>
       {main ? (
         <View style={styles.mainNav}>
-          <Text style={styles.logo}>HJ</Text>
+          {/* if we are in the homepage don't show the go Back button  */}
+          <Text style={styles.logo}>HS</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Search")}>
             <Icon name="search-outline" style={styles.title} />
           </TouchableOpacity>

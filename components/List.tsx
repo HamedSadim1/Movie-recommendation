@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import React, { FC } from "react";
-import { Data, Result } from "./services/IMovieData";
+import { Data } from "./services/IMovieData";
 import ListItem from "./ListItem";
 
 interface IMovieProps {
