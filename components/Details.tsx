@@ -174,7 +174,7 @@ const Details = () => {
           );
       };
     }
-  }, []);
+  }, [movieId]);
   return (
     <View>
       <View style={styles.container}>
