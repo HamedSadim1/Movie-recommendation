@@ -20,21 +20,42 @@ import * as Notifications from "expo-notifications";
 
 import { Rating } from "react-native-ratings";
 import FavoriteButton from "./FavoriteButton";
+
+//! Dimensions object used to get the width and height of the screen
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
+/**
+ *  This component is used to display detailed information about a movie, including its title,
+ *  release date, overview, and rating. It also includes a favorite button that allows the user
+ *  to add the movie to their favorites list and a share button that allows the user to share
+ *  the movie with their friends.
+ */
+
 const Details = () => {
+  //! route prop used to get the movieId passed from the previous screen
   const route: RouteProp<any> = useRoute();
   const [movieDetails, setMovieDetails] = useState<Detail>({} as Detail);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  //! state variable that holds the expo push token for the device
   const [expoPushToken, setExpoPushToken] = useState<string>("");
+  //! state variable that holds the notification object
   const [notification, setNotification] =
     useState<Notifications.Notification>();
+  //! useRef object used to store a reference to the notification listener
   const notificationListener = useRef<any>();
+  //! useRef object used to store a reference to the response listener
   const responseListener = useRef();
 
+  /**
+   *  This function is used to set the movie details in AsyncStorage when the user adds
+   *  the movie to their favorites. If the movie is already in the user's favorites list,
+   *  an alert is shown. Otherwise, the movie is added to the list and you get notifications
+   *
+   *  the movieId of the movie to add to the favorites list.
+   */
   const setDataInLocalStorage = async (movieId: string) => {
     try {
       //! get all the existing items from AsyncStorage
@@ -49,7 +70,7 @@ const Details = () => {
       //! if the movieId is not in the array, add it to the array
       if (arrExist) {
         // ! Convert into JavaScript
-        // sendPushNotification();
+        //! sendPushNotification;
         await schedulePushNotification();
         const arr = JSON.parse(arrExist);
         // ! Add the new movieId
@@ -76,7 +97,11 @@ const Details = () => {
       shouldSetBadge: true,
     }),
   });
-  //! the function will called if the heart button clicked
+
+  /**
+   *  This function is used to schedule a push notification when the user adds a movie
+   *  to their favorites. The notification includes the title and overview of the movie.
+   */
   const schedulePushNotification = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
@@ -91,6 +116,7 @@ const Details = () => {
   //! if the button is clicked you will able to share
   const onShare = async () => {
     try {
+      //! if the share was successful
       const result = await Share.share({
         message: `Hey, I just found this movie on the Movie Recommendation App. Check it out: Movie Title  ${movieDetails.title} - Movie Review ${movieDetails.overview} Release Date  ${movieDetails.release_date}`,
         title: "Movie Recommendation",
@@ -152,7 +178,7 @@ const Details = () => {
         .finally(() => {
           setLoading(false);
         });
-      //! register for push notification
+      //! register the device for push notifications
       registerForPushNotificationsAsync().then((token) => {
         if (token !== undefined) setExpoPushToken(token);
       });
@@ -161,7 +187,7 @@ const Details = () => {
         Notifications.addNotificationReceivedListener((notification) => {
           setNotification(notification);
         });
-
+      //! clean up the listeners
       return () => {
         //! removes the notification subscription for the notificationListener and the responseListener
         Notifications.removeNotificationSubscription(
@@ -227,7 +253,7 @@ const Details = () => {
       </ScrollView>
 
       {error.length > 1 && <Text>{error}</Text>}
-      {movieId === 0 && route === null && (
+      {movieId! && route === null && (
         <View style={styles.container}>
           <Text style={styles.movieTitle}>No Movie Found</Text>
         </View>

@@ -99,7 +99,7 @@ const Movie = () => {
     return () => clearInterval(interval);
   };
 
-  //! Promise Array
+  //! Get all the data for each movie type
   const getData = async () => {
     const popularMovies = await getPopularMovies();
     const upcomingMovies = await getUpcomingMovies();
@@ -132,7 +132,7 @@ const Movie = () => {
       .finally(() => {
         setLoading(false);
       });
-
+    //! clean the interval
     const unsubscribe = infiniteScroll();
     return unsubscribe;
   }, []);

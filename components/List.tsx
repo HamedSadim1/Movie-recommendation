@@ -8,6 +8,7 @@ interface IMovieProps {
   Movies: Data;
 }
 
+//! Rendering the the list movies
 const List: FC<IMovieProps> = ({ title, Movies }) => {
   const { results } = Movies;
   return (

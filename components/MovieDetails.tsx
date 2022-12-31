@@ -6,7 +6,9 @@ import Movie from "./Movie";
 import Navbar from "./Navbar";
 import Search from "./Search";
 
+//!creates a stack navigator with native transitions.
 const Stack = createNativeStackNavigator();
+//! make screens for Search and Detail and Movie
 const MovieDetails = () => {
   return (
     <Stack.Navigator>

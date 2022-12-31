@@ -15,6 +15,7 @@ import { searchMovie, Data } from "./services/IMovieData";
 import ListItem from "./ListItem";
 import Icon from "react-native-vector-icons/Ionicons";
 
+//! Rendering the the list movies, search for a movie
 const Search = () => {
   const [search, setSearch] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<Data>({

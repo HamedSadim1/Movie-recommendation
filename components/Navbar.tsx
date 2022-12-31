@@ -13,6 +13,8 @@ interface NavbarProps {
   main: boolean;
 }
 
+//! Renders a navbar with a search button and a logo and back button
+
 const Navbar = ({ main }: NavbarProps) => {
   const navigation: any = useNavigation();
 

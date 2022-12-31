@@ -7,6 +7,8 @@ interface ListItemProps {
   result: Result;
 }
 
+//! Rendering each movie in the list and and Navigate to detail page
+
 const ListItem = ({ result }: ListItemProps) => {
   const navigation: any = useNavigation();
   return (

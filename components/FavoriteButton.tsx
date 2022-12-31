@@ -8,20 +8,24 @@ interface FavoriteButtonProps {
   getFavoriteStatus: () => Promise<string>;
 }
 
+//! Renders a favorite button and a share button"
+
 const FavoriteButton = ({
   handlePress,
   onShare,
   getFavoriteStatus,
 }: FavoriteButtonProps) => {
-  const [favoriteStatus, setFavoriteStatus] = useState<string>("favorite");
+  const [favoriteStatus, setFavoriteStatus] =
+    useState<string>("favorite-border");
 
+  //! Fetches the favorite status and updates the component's state when the component  when the favorite status changes
   useEffect(() => {
     const fetchFavoriteStatus = async () => {
       const status = await getFavoriteStatus();
       setFavoriteStatus(status);
     };
     fetchFavoriteStatus();
-  }, [handlePress]);
+  }, [favoriteStatus, handlePress, onShare]);
   return (
     <View>
       <View>

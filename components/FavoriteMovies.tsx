@@ -4,10 +4,12 @@ import AsyncStorage, {
   useAsyncStorage,
 } from "@react-native-async-storage/async-storage";
 
+//! Renders a list of  movies
 const FavoriteMovies = () => {
   const { getItem } = useAsyncStorage("favorite");
   const [value, setValue] = useState<string[]>([]);
 
+  //! Reads the favorite movies from AsyncStorage and sets them in the component's state
   const readItemFromStorage = async () => {
     try {
       //! get items from Storage
